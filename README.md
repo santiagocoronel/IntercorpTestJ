@@ -1,2 +1,2 @@
 # IntercorpTestJ
- IntercorpTestJ by Hector Santiago Coronel
+ IntercorpTestJ By Hector Santiago Coronel
