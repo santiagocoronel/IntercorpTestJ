@@ -9,8 +9,11 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.example.intercorptestj.App;
 import com.example.intercorptestj.databinding.ActivityMainBinding;
+import com.example.intercorptestj.di.AppComponent;
 import com.example.intercorptestj.model.pojo.User;
+import com.example.intercorptestj.model.repository.FirebaseRepositoryContract;
 import com.example.intercorptestj.model.repository.FirebaseRepositoryImpl;
 import com.example.intercorptestj.util.base.BaseActivity;
 import com.example.intercorptestj.view.splash.SplashActivity;
@@ -19,23 +22,30 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.SimpleDateFormat;
 
+import javax.inject.Inject;
+
 public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding binding;
-
-    private MainViewModel viewModel;
-
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     private ConstraintLayout view;
 
+    @Inject
+    FirebaseRepositoryContract firebaseRepository;
+
+    private MainViewModel viewModel;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        initComponent(((App) getApplicationContext()).getAppComponent());
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         view = binding.getRoot();
         setContentView(view);
 
-        MainViewModelFactory viewModelFactory = new MainViewModelFactory(new FirebaseRepositoryImpl());
+        MainViewModelFactory viewModelFactory = new MainViewModelFactory(firebaseRepository);
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MainViewModel.class);
 
         init();
@@ -87,5 +97,10 @@ public class MainActivity extends BaseActivity {
         Intent intent = new Intent(MainActivity.this, SplashActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    @Override
+    protected void initComponent(AppComponent appComponent) {
+        appComponent.inject(this);
     }
 }

@@ -1,16 +1,23 @@
 package com.example.intercorptestj.view.login;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.activity.ComponentActivity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.example.intercorptestj.App;
 import com.example.intercorptestj.databinding.ActivityLoginBinding;
+import com.example.intercorptestj.di.AppComponent;
+import com.example.intercorptestj.di.DaggerAppComponent;
+import com.example.intercorptestj.di.module.ViewModelFactory;
+import com.example.intercorptestj.model.repository.FirebaseRepositoryContract;
 import com.example.intercorptestj.model.repository.FirebaseRepositoryImpl;
 import com.example.intercorptestj.util.ScreenState;
 import com.example.intercorptestj.util.base.BaseActivity;
@@ -34,24 +41,30 @@ import com.google.firebase.auth.PhoneAuthProvider;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 public class LoginActivity extends BaseActivity {
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private CallbackManager mCallbackManager;
     private ActivityLoginBinding binding;
-    private LoginViewModel viewModel;
     private Boolean isStateEnterPhoneNumber = true;
     private ConstraintLayout view;
 
+    @Inject
+    FirebaseRepositoryContract firebaseRepository;
+    private LoginViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        initComponent(((App) getApplicationContext()).getAppComponent());
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         view = binding.getRoot();
         setContentView(view);
 
-        LoginViewModelFactory viewModelFactory = new LoginViewModelFactory(new FirebaseRepositoryImpl());
+        LoginViewModelFactory viewModelFactory = new LoginViewModelFactory(firebaseRepository);
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginViewModel.class);
 
         init();
@@ -253,4 +266,8 @@ public class LoginActivity extends BaseActivity {
         binding.buttonLogin.setText("Login");
     }
 
+    @Override
+    protected void initComponent(AppComponent appComponent) {
+        appComponent.inject(this);
+    }
 }

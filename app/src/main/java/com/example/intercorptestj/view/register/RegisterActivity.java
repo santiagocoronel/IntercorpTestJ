@@ -10,8 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.example.intercorptestj.App;
 import com.example.intercorptestj.databinding.ActivityRegisterBinding;
+import com.example.intercorptestj.di.AppComponent;
 import com.example.intercorptestj.model.pojo.User;
+import com.example.intercorptestj.model.repository.FirebaseRepositoryContract;
 import com.example.intercorptestj.model.repository.FirebaseRepositoryImpl;
 import com.example.intercorptestj.util.base.BaseActivity;
 import com.example.intercorptestj.view.datepicker.DatePickerDialogFragment;
@@ -24,24 +27,30 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 public class RegisterActivity extends BaseActivity {
 
     private ActivityRegisterBinding binding;
-    private RegisterViewModel viewModel;
 
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private ConstraintLayout view;
 
+    @Inject
+    FirebaseRepositoryContract firebaseRepository;
+    private RegisterViewModel viewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        initComponent(((App) getApplicationContext()).getAppComponent());
         super.onCreate(savedInstanceState);
         binding = ActivityRegisterBinding.inflate(getLayoutInflater());
         view = binding.getRoot();
         setContentView(view);
 
-        RegisterViewModelFactory viewModelFactory = new RegisterViewModelFactory(new FirebaseRepositoryImpl());
+        RegisterViewModelFactory viewModelFactory = new RegisterViewModelFactory(firebaseRepository);
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(RegisterViewModel.class);
 
         init();
@@ -157,4 +166,8 @@ public class RegisterActivity extends BaseActivity {
         startActivity(intent);
     }
 
+    @Override
+    protected void initComponent(AppComponent appComponent) {
+        appComponent.inject(this);
+    }
 }

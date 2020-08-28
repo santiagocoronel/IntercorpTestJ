@@ -8,10 +8,13 @@ import com.example.intercorptestj.model.repository.FirebaseRepositoryContract;
 
 import java.lang.reflect.InvocationTargetException;
 
+import javax.inject.Inject;
+
 public class LoginViewModelFactory implements ViewModelProvider.Factory {
 
     private final FirebaseRepositoryContract firebaseRepository;
 
+    @Inject
     public LoginViewModelFactory(FirebaseRepositoryContract firebaseRepository) {
         this.firebaseRepository = firebaseRepository;
     }
